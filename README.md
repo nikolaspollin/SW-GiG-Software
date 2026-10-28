@@ -1,1 +1,1 @@
-# SE-GiG-Software
+# SW-GiG-Software
