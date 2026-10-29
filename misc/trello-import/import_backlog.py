@@ -33,7 +33,7 @@ import warnings
 from dataclasses import dataclass, field
 from pathlib import Path
 
-DEFAULT_XLSX = Path(__file__).resolve().parent.parent / "SE_GiG_ProductBacklog.xlsx"
+DEFAULT_XLSX = Path(__file__).resolve().parent / "SE_GiG_ProductBacklog.xlsx"
 DEFAULT_SHEET = "PB Items"
 DEFAULT_LIST = "Backlog"
 HEADER_ROW = 5  # 1-based row number of the header line in the sheet

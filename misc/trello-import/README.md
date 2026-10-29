@@ -1,6 +1,6 @@
 # Product backlog -> Trello import
 
-Imports the `PB Items` sheet of `../SE_GiG_ProductBacklog.xlsx` (header in row 5, data from row 6) as cards
+Imports the `PB Items` sheet of `SE_GiG_ProductBacklog.xlsx` (header in row 5, data from row 6) as cards
 into the `Backlog` list of a Trello board.
 
 ## Setup
