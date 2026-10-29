@@ -82,4 +82,7 @@ These use an external generative AI REST API.
 
 ## Product backlog
 
-The full backlog (user stories, owners, sprints, acceptance criteria) is in `misc/trello-import/SE_GiG_ProductBacklog.xlsx`, sheet `PB Items`. The same folder contains a script that imports it into a Trello board (see its `README.md`).
+**Excel Backlog (Sharepoint):** https://othrgb-my.sharepoint.com/:x:/r/personal/pon32369_hs-regensburg_de/Documents/Softwareentwicklung%20-%20Projekt/SE%20-%20GiG%20-%20Product%20Backlog.xlsx?d=wf3567f3711bd48a486b93e9ffc916faa&csf=1&web=1&e=Kljn2x
+**Trello Board:** https://trello.com/b/u6s2Anai
+
+misc/trello-import contains the script for moving product backlog items from the excel spreadsheet into the Trello board.
