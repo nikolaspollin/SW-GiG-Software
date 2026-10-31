@@ -11,7 +11,7 @@ Team: Timo, Niki, Paul, Basti and Johannes.
 | `backend/`  | Spring Boot 4 (Java 25) REST backend: Spring Web MVC, Spring Data JPA, Spring Security, Bean Validation. MySQL and PostgreSQL drivers are included. |
 | `frontend/` | Angular 22 (TypeScript) single-page application used by guests and staff.                |
 | `docs/`     | Project documentation.                                                                   |
-| `misc/`     | Product backlog (`misc/trello-import/SE_GiG_ProductBacklog.xlsx`) and the script that imports it into Trello (`misc/trello-import`). |
+| `misc/`     | Product backlog import script for Trello (`misc/trello-import`). |
 
 ### Running locally
 
