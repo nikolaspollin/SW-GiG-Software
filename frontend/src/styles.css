@@ -1,1 +1,58 @@
-/* You can add global styles to this file, and also import other style files */
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: #f5f5f0;
+  color: #202e28;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+}
+button,
+input,
+textarea {
+  font: inherit;
+}
+button,
+input,
+textarea,
+a {
+  touch-action: manipulation;
+}
+button {
+  min-height: 44px;
+  padding: 0.5rem 1rem;
+  border: 1px solid #476357;
+  border-radius: 0.4rem;
+  background: white;
+  color: #173b31;
+  cursor: pointer;
+}
+button:disabled {
+  cursor: default;
+  opacity: 0.65;
+}
+button.primary {
+  background: #173b31;
+  color: white;
+}
+input,
+textarea {
+  padding: 0.5rem;
+  border: 1px solid #69766e;
+  border-radius: 0.3rem;
+  max-width: 100%;
+}
+input[type='number'] {
+  width: 6rem;
+}
+:focus-visible {
+  outline: 3px solid #9c4b00;
+  outline-offset: 3px;
+}
+.error {
+  color: #9b2020;
+}
+.muted {
+  color: #53635b;
+}
