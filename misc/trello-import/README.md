@@ -62,4 +62,4 @@ the card is still created and names the owner in its description. For unusual us
 python -m unittest -v
 ```
 
-The tests use the real xlsx file and an in-memory fake of the Trello API (no network, no credentials).
+The tests generate a temporary sample workbook and use an in-memory Trello fake (no local backlog, network or credentials required).

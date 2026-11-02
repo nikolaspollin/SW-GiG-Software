@@ -26,7 +26,15 @@ npm install
 npm start        # ng serve
 ```
 
-Implemented: [US17 guest cart — setup, API and tests](docs/US17-cart.md). Real session/menu adapters still await F03/F06/F07.
+
+### Pull request checks
+
+The `Tests` workflow runs backend, frontend and importer tests, plus the frontend build, on every PR update and push to `main`. PRs that define `test:e2e` also run browser/accessibility tests. Re-run it from the PR check, or use **Actions → Tests → Run workflow** and select a branch.
+
+To block merging, an admin must protect `main`: require a pull request, require the **All tests** status check, require branches to be up to date, and disallow bypassing. Run the workflow once so GitHub offers the check. Workflow YAML alone cannot enforce merging rules.
+
+Private-repo branch protection needs Pro (personal owner) or Team (organization); verified students can claim free Pro through the [Student Developer Pack](https://education.github.com/pack/). Actions runs use the owner's included compute/storage allowance; set a zero spending budget with **Stop usage when budget limit is reached** in billing to avoid overage. See [branch protection](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches) and [Actions billing](https://docs.github.com/en/billing/concepts/product-billing/github-actions).
+
 
 ## Users
 
