@@ -30,12 +30,15 @@
         <java.version>25</java.version>
     </properties>
     <dependencies>
-        <!-- TODO: Configure Database Connection in order to include JPA Package
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
-        -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
         <!-- TODO: Configure Security
         <dependency>
             <groupId>org.springframework.boot</groupId>

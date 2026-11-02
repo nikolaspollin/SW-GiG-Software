@@ -26,6 +26,8 @@ npm install
 npm start        # ng serve
 ```
 
+Implemented: [US17 guest cart — setup, API and tests](docs/US17-cart.md). Real session/menu adapters still await F03/F06/F07.
+
 ## Users
 
 | Role          | What they need                                                                 |
