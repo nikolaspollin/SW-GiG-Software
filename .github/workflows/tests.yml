@@ -1,0 +1,79 @@
+name: Tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    name: All tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CI: 'true'
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+          cache-dependency-path: backend/pom.xml
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+          cache: pip
+          cache-dependency-path: misc/trello-import/requirements.txt
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: frontend
+      - name: Backend tests
+        run: ./mvnw -B -ntp test
+        working-directory: backend
+      - name: Frontend tests and production build
+        run: |
+          npm test -- --watch=false
+          npm run build
+        working-directory: frontend
+      - name: Importer tests (offline)
+        run: |
+          python -m pip install -r requirements.txt
+          python -m unittest -v
+        working-directory: misc/trello-import
+      - name: Detect browser suite
+        id: browser
+        run: node -e "require('node:fs').appendFileSync(process.env.GITHUB_OUTPUT, 'enabled=' + Boolean(require('./frontend/package.json').scripts['test:e2e']) + '\n')"
+      - name: Install browser
+        if: steps.browser.outputs.enabled == 'true'
+        run: npx playwright install --with-deps chromium chrome
+        working-directory: frontend
+      - name: Browser and accessibility tests
+        if: steps.browser.outputs.enabled == 'true'
+        run: npm run test:e2e -- --forbid-only
+        working-directory: frontend
+      - name: Save failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-failures
+          retention-days: 3
+          if-no-files-found: ignore
+          path: |
+            backend/target/surefire-reports/
+            frontend/test-results/

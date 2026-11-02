@@ -1,12 +1,49 @@
 """Tests for import_backlog.py (run: python -m unittest -v, inside misc/trello-import).
 
-The Trello API is replaced by an in-memory fake, the xlsx file is the real product backlog.
+Uses a temporary sample workbook and a fake Trello API; no credentials or local files needed.
 """
 
 import argparse
 import unittest
+from pathlib import Path
+from tempfile import TemporaryDirectory
+
+from openpyxl import Workbook
 
 import import_backlog as ib
+
+TEST_XLSX: Path
+
+
+def setUpModule():
+    """Creates a disposable workbook covering labels, owners and row boundaries."""
+    global TEST_XLSX
+    temporary = TemporaryDirectory()
+    unittest.addModuleCleanup(temporary.cleanup)
+    TEST_XLSX = Path(temporary.name) / "backlog.xlsx"
+    workbook = Workbook()
+    sheet = workbook.active
+    sheet.title = ib.DEFAULT_SHEET
+    for column, header in enumerate(ib.REQUIRED_HEADERS, 1):
+        sheet.cell(ib.HEADER_ROW, column, header)
+    owners = ("Timo", "Niki", "Paul", "Basti", "Johannes")
+    for index in range(1, 46):
+        row = {
+            ib.H_ID: f"US{index:02}", ib.H_FEATURE: "F01", ib.H_TYPES[0]: "Geschäftsfunktion / CRUD",
+            ib.H_PERSONA: "Manager", ib.H_ACTION: f"perform task {index}",
+            ib.H_VALUE: "only authorised staff access operational data",
+            ib.H_PRIORITY: "Must Have" if index < 40 else "Could Have",
+            ib.H_SPRINT: 1, ib.H_ESTIMATION: 5,
+            ib.H_TASKS: owners[(index - 1) % len(owners)] + "\nStaff/Role entities, CRUD screens.",
+            ib.H_ACCEPTANCE: "Manager-only CRUD.",
+        }
+        if index == 1:
+            row.update({ib.H_TYPES[1]: "Eigene REST-API", ib.H_TYPES[2]: "Paginierung / Suche / Sortierung",
+                        ib.H_ACTION: "create, edit, deactivate and search staff accounts and role assignments"})
+        for column, header in enumerate(ib.REQUIRED_HEADERS, 1):
+            sheet.cell(ib.HEADER_ROW + index, column, row.get(header))
+    workbook.save(TEST_XLSX)
+    workbook.close()
 
 
 class FakeTrello:
@@ -48,7 +85,7 @@ class FakeTrello:
 
 
 def args(**overrides):
-    base = dict(file=str(ib.DEFAULT_XLSX), sheet=ib.DEFAULT_SHEET, board="https://trello.com/b/abc/gig",
+    base = dict(file=str(TEST_XLSX), sheet=ib.DEFAULT_SHEET, board="https://trello.com/b/abc/gig",
                 list="Backlog", owner_map=None, limit=None, dry_run=False, verbose=False)
     base.update(overrides)
     return argparse.Namespace(**base)
@@ -57,7 +94,7 @@ def args(**overrides):
 class ParsingTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.items = ib.read_backlog(ib.DEFAULT_XLSX)
+        cls.items = ib.read_backlog(TEST_XLSX)
 
     def test_reads_all_rows_6_to_50(self):
         self.assertEqual(len(self.items), 45)
