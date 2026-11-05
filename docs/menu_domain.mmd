@@ -1,0 +1,90 @@
+---
+title: Menu Domain Diagramm
+---
+classDiagram
+
+    class Menu {
+        -UUID id
+        -String name
+        -LifecycleStatus lifecycleStatus
+    }
+
+    class ServingDays {
+        <<abstract>>
+        <<ValueObject>>
+    }
+
+    class RegularServingDays {
+        %% Selected days are meant for start date
+        %% (e.g. Menu could still be available on Saturday at 2:00, although Saturday wasn't selected here)
+        -Set~DayOfWeek~ regularDays [1..*]
+    }
+
+    class FixedDateServingDays {
+        -Set~LocalDate~ fixedDates [1..*]
+    }
+
+    note for ServingTimeWindow "ServingTimeWindow of a
+          MenuCategory needs to be inside
+          Menu's serving window"
+
+    class ServingTimeWindow {
+        <<ValueObject>>
+
+        -LocalTime startTime
+        %% endTime <= startTime => Serving Window lasts until following day
+        -LocalTime endTime
+    }
+
+    class MenuCategory {
+        -UUID id
+        %% Constraint: displayOrder unique within owning Menu
+        -Integer displayOrder
+    }
+
+    class Category {
+        -UUID id
+        -String displayName
+        %% Constraint: internalName unique across Categories
+        -String internalName
+        -LifecycleStatus lifecycleStatus
+    }
+
+    note for Product "Products can be Sold out and need
+                      to be reordered by the management"
+
+    class Product {
+        -UUID id
+        -String name
+        -String description [0..1]
+        -BigDecimal price
+        -LifecycleStatus lifecycleStatus
+        -boolean available
+    }
+
+    class PreparationStation { }
+
+    note for PreparationStation "Definition in another Diagramm"
+
+    class LifecycleStatus {
+        <<enumeration>>
+
+        DRAFT
+        ACTIVE
+        ARCHIVED
+    }
+
+
+    Menu "1" --> "1" ServingDays
+    Menu "1" --> "1" ServingTimeWindow
+
+    ServingDays <|-- RegularServingDays
+    ServingDays <|-- FixedDateServingDays
+
+    Menu "1" *-- "0..*" MenuCategory
+
+    MenuCategory "0..*" --> "1" Category
+    MenuCategory "1" --> "0..1" ServingTimeWindow : (optional)
+
+    Product "0..*" --o "1" Category
+    Product "0..*" --> "1" PreparationStation
