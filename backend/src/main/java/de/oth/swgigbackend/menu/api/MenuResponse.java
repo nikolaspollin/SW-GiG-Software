@@ -9,7 +9,11 @@ import java.util.UUID;
 public record MenuResponse(UUID id, String name, LifecycleStatus lifecycleStatus,
                            ServingDays servingDays, ServingTimeWindow servingTimeWindow) {
     public static MenuResponse from(Menu menu) {
-        return new MenuResponse(menu.getId(), menu.getName(), menu.getLifecycleStatus(),
-                menu.getServingDays(), menu.getServingTimeWindow());
+        return new MenuResponse(
+                menu.getId(),
+                menu.getName(),
+                menu.getLifecycleStatus(),
+                menu.getServingDays(),
+                menu.getServingTimeWindow());
     }
 }

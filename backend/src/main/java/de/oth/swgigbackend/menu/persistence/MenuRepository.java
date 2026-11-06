@@ -13,6 +13,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface MenuRepository extends JpaRepository<Menu, UUID> {
 
+    // Only active menus are relevant for overlap detection
     // Treat is comparable to a cast => enables access to regularDays attribute
     @Query("SELECT DISTINCT m FROM Menu m JOIN TREAT(m.servingDays AS RegularServingDays).regularDays d WHERE m.lifecycleStatus = ACTIVE AND d IN :weekdays")
     List<Menu> findPossibleWeekdayOverlapMenus(@Param("weekdays") Collection<DayOfWeek> weekdays);

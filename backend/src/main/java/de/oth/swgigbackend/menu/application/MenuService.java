@@ -45,9 +45,22 @@ public class MenuService {
 
     @Transactional
     public MenuResponse createMenu(MenuRequest request) {
+        validateMenu(request, null);
 
+        Menu menu = new Menu(
+                request.name(),
+                request.lifecycleStatus(),
+                request.servingDays(),
+                request.servingTimeWindow()
+        );
+
+        return MenuResponse.from(menuRepository.save(menu));
+    }
+
+    // A null excludedMenuId means creation; updates exclude their own persisted menu.
+    private void validateMenu(MenuRequest request, UUID excludedMenuId) {
         if (request.lifecycleStatus() == LifecycleStatus.ARCHIVED)
-            throw new IllegalArgumentException("New menu cannot be in archived state");
+            throw new IllegalArgumentException("Menu cannot be created or updated in archived state");
 
         // Checks only consider active menus (no drafts / archived menus)
         if (request.lifecycleStatus() == LifecycleStatus.ACTIVE) {
@@ -65,11 +78,17 @@ public class MenuService {
                         overlapCandidates.add(day.plus(1));
                 }
 
-                List<Menu> candidates = menuRepository.findPossibleWeekdayOverlapMenus(overlapCandidates);
+                // For update case: filter own menu from database results
+                List<Menu> candidates = menuRepository.findPossibleWeekdayOverlapMenus(overlapCandidates)
+                        .stream()
+                        .filter(menu -> excludedMenuId == null || !excludedMenuId.equals(menu.getId()))
+                        .toList();
 
-                if (hasTimeWindowOverlap(candidates, request.servingTimeWindow(), regular.getRegularDays()))
+                // Actual time window check
+                if (hasRegularTimeWindowOverlap(candidates, request.servingTimeWindow(), regular.getRegularDays()))
                     throw new IllegalArgumentException("Menu serving time window overlaps an existing menu");
             } // Check fixed date windows as well
+            // Fixed Date Menus are allowed to overlap weekday menus, therefore, weekday menus can be ignored
             else if (request.servingDays() instanceof FixedDateServingDays fixed) {
                 Set<LocalDate> overlapCandidates = new HashSet<>(fixed.getFixedDates());
 
@@ -80,34 +99,25 @@ public class MenuService {
                         overlapCandidates.add(date.plusDays(1));
                 }
 
-                // Fixed Date Menus are allowed to overlap weekday menus, therefore, weekday menus can be ignored
-                List<Menu> candidates = menuRepository.findPossibleFixedDateOverlapMenus(overlapCandidates);
+                // For update case: filter own menu from database results
+                List<Menu> candidates = menuRepository.findPossibleFixedDateOverlapMenus(overlapCandidates)
+                        .stream()
+                        .filter(menu -> excludedMenuId == null || !excludedMenuId.equals(menu.getId()))
+                        .toList();
 
                 if (hasFixedDateTimeWindowOverlap(candidates, request.servingTimeWindow(), fixed.getFixedDates()))
                     throw new IllegalArgumentException("Menu serving time window overlaps an existing menu");
             } else
                 throw new IllegalStateException("Inconsistent menu state (serving days)");
         }
-
-        // Store actual menu
-        Menu menu = new Menu(
-                request.name(),
-                request.lifecycleStatus(),
-                request.servingDays(),
-                request.servingTimeWindow()
-        );
-
-        menuRepository.save(menu);
-
-        return MenuResponse.from(menu);
     }
 
     /** Compares regular menus using [start, end) windows and their relative start days. */
-    boolean hasTimeWindowOverlap(List<Menu> existingMenus, ServingTimeWindow requestedWindow,
-                                 Set<DayOfWeek> requestedDays) {
+    boolean hasRegularTimeWindowOverlap(List<Menu> existingMenus, ServingTimeWindow requestedWindow,
+                                        Set<DayOfWeek> requestedDays) {
         long day = Duration.ofDays(1).toNanos();
 
-        // Convert to number values to compare them
+        // Convert to number values for convenient comparison
         long start = requestedWindow.startTime().toNanoOfDay();
         long end = requestedWindow.endTime().toNanoOfDay();
         if (end <= start) end += day;
@@ -170,8 +180,21 @@ public class MenuService {
         return false;
     }
 
+    @Transactional
     public MenuResponse updateMenu(UUID menuId, MenuRequest request) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        Menu menu = menuRepository.findById(menuId)
+                .orElseThrow(() -> new EntityNotFoundException("Menu not found"));
+
+        // Validate before changing the managed entity, so queries see its previous state.
+        validateMenu(request, menuId);
+
+        menu.setName(request.name());
+        menu.setLifecycleStatus(request.lifecycleStatus());
+        menu.setServingDays(request.servingDays());
+        menu.setServingTimeWindow(request.servingTimeWindow());
+
+        // Hibernate persists the changes when the transaction commits.
+        return MenuResponse.from(menu);
     }
 
     @Transactional

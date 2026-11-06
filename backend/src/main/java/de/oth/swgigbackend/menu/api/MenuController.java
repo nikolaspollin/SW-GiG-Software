@@ -42,9 +42,9 @@ public class MenuController {
     }
 
     @PutMapping("/{menuId}")
-    public ResponseEntity<Void> updateMenu(@PathVariable UUID menuId,
-                                         @Valid @RequestBody MenuRequest request) {
-        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
+    public MenuResponse updateMenu(@PathVariable UUID menuId,
+                                   @Valid @RequestBody MenuRequest request) {
+        return menuService.updateMenu(menuId, request);
     }
 
     @DeleteMapping("/{menuId}")
