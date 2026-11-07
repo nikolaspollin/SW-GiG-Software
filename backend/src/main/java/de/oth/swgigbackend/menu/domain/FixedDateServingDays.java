@@ -5,6 +5,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotEmpty;
@@ -18,7 +19,7 @@ import java.util.Set;
 @DiscriminatorValue("FIXED")
 public class FixedDateServingDays extends ServingDays {
     @NotEmpty
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "menu_fixed_dates", joinColumns = @JoinColumn(name = "menu_id"),
             uniqueConstraints = @UniqueConstraint(columnNames = {"menu_id", "serving_date"}))
     @Column(name = "serving_date", nullable = false)

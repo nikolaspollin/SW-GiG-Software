@@ -7,6 +7,7 @@ import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotEmpty;
@@ -20,7 +21,7 @@ import java.util.Set;
 @DiscriminatorValue("REGULAR")
 public class RegularServingDays extends ServingDays {
     @NotEmpty
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "menu_weekdays", joinColumns = @JoinColumn(name = "menu_id"),
             uniqueConstraints = @UniqueConstraint(columnNames = {"menu_id", "weekday"}))
     @Enumerated(EnumType.STRING)

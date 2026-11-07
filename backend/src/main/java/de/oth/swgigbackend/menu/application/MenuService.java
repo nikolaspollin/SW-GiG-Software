@@ -15,7 +15,6 @@ import java.util.UUID;
 
 import de.oth.swgigbackend.menu.domain.*;
 import de.oth.swgigbackend.menu.persistence.MenuRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,12 +39,15 @@ public class MenuService {
 
         return menuRepository.findById(menuId)
                 .map(MenuResponse::from)
-                .orElseThrow(() -> new EntityNotFoundException("Desired menu not found"));
+                .orElseThrow(MenuNotFoundException::new);
     }
 
     @Transactional
     public MenuResponse createMenu(MenuRequest request) {
-        validateMenu(request, null);
+        if (request.lifecycleStatus() == LifecycleStatus.ARCHIVED)
+            throw new ArchivedMenuException("Menu cannot be created or updated in archived state");
+
+        validateServingWindow(request, null);
 
         Menu menu = new Menu(
                 request.name(),
@@ -58,10 +60,7 @@ public class MenuService {
     }
 
     // A null excludedMenuId means creation; updates exclude their own persisted menu.
-    private void validateMenu(MenuRequest request, UUID excludedMenuId) {
-        if (request.lifecycleStatus() == LifecycleStatus.ARCHIVED)
-            throw new IllegalArgumentException("Menu cannot be created or updated in archived state");
-
+    private void validateServingWindow(MenuRequest request, UUID excludedMenuId) {
         // Checks only consider active menus (no drafts / archived menus)
         if (request.lifecycleStatus() == LifecycleStatus.ACTIVE) {
             // Check week day serving window overlapping with existing menus
@@ -86,7 +85,7 @@ public class MenuService {
 
                 // Actual time window check
                 if (hasRegularTimeWindowOverlap(candidates, request.servingTimeWindow(), regular.getRegularDays()))
-                    throw new IllegalArgumentException("Menu serving time window overlaps an existing menu");
+                    throw new ServingWindowOverlapException();
             } // Check fixed date windows as well
             // Fixed Date Menus are allowed to overlap weekday menus, therefore, weekday menus can be ignored
             else if (request.servingDays() instanceof FixedDateServingDays fixed) {
@@ -106,9 +105,9 @@ public class MenuService {
                         .toList();
 
                 if (hasFixedDateTimeWindowOverlap(candidates, request.servingTimeWindow(), fixed.getFixedDates()))
-                    throw new IllegalArgumentException("Menu serving time window overlaps an existing menu");
+                    throw new ServingWindowOverlapException();
             } else
-                throw new IllegalStateException("Inconsistent menu state (serving days)");
+                throw new InvalidServingDaysException();
         }
     }
 
@@ -183,10 +182,13 @@ public class MenuService {
     @Transactional
     public MenuResponse updateMenu(UUID menuId, MenuRequest request) {
         Menu menu = menuRepository.findById(menuId)
-                .orElseThrow(() -> new EntityNotFoundException("Menu not found"));
+                .orElseThrow(MenuNotFoundException::new);
+
+        if (menu.getLifecycleStatus() == LifecycleStatus.ARCHIVED || request.lifecycleStatus() == LifecycleStatus.ARCHIVED)
+            throw new ArchivedMenuException("Menu cannot be created or updated in archived state");
 
         // Validate before changing the managed entity, so queries see its previous state.
-        validateMenu(request, menuId);
+        validateServingWindow(request, menuId);
 
         menu.setName(request.name());
         menu.setLifecycleStatus(request.lifecycleStatus());
@@ -202,7 +204,7 @@ public class MenuService {
         //TODO MenuCategory need to be considered later as well
 
         Menu menu = menuRepository.findById(menuId)
-                .orElseThrow(() -> new EntityNotFoundException("Menu not found"));
+                .orElseThrow(MenuNotFoundException::new);
 
         menu.setLifecycleStatus(LifecycleStatus.ARCHIVED);
     }
