@@ -62,56 +62,57 @@ public class MenuService {
     // A null excludedMenuId means creation; updates exclude their own persisted menu.
     private void validateServingWindow(MenuRequest request, UUID excludedMenuId) {
         // Checks only consider active menus (no drafts / archived menus)
-        if (request.lifecycleStatus() == LifecycleStatus.ACTIVE) {
-            // Check week day serving window overlapping with existing menus
-            if (request.servingDays() instanceof RegularServingDays regular) {
-                Set<DayOfWeek> overlapCandidates = EnumSet.copyOf(regular.getRegularDays());
+        if (request.lifecycleStatus() != LifecycleStatus.ACTIVE)
+            return;
 
-                // Duplicates are negligible because of EnumSet
-                for (DayOfWeek day : regular.getRegularDays()) {
-                    // Menu of previous day could last until after midnight
-                    overlapCandidates.add(day.minus(1));
+        // Check week day serving window overlapping with existing menus
+        if (request.servingDays() instanceof RegularServingDays regular) {
+            Set<DayOfWeek> overlapCandidates = EnumSet.copyOf(regular.getRegularDays());
 
-                    // New Menu could last until after midnight and create a conflict then
-                    if (!request.servingTimeWindow().endTime().isAfter(request.servingTimeWindow().startTime()))
-                        overlapCandidates.add(day.plus(1));
-                }
+            // Duplicates are negligible because of EnumSet
+            for (DayOfWeek day : regular.getRegularDays()) {
+                // Menu of previous day could last until after midnight
+                overlapCandidates.add(day.minus(1));
 
-                // For update case: filter own menu from database results
-                List<Menu> candidates = menuRepository.findPossibleWeekdayOverlapMenus(overlapCandidates)
-                        .stream()
-                        .filter(menu -> excludedMenuId == null || !excludedMenuId.equals(menu.getId()))
-                        .toList();
+                // New Menu could last until after midnight and create a conflict then
+                if (!request.servingTimeWindow().endTime().isAfter(request.servingTimeWindow().startTime()))
+                    overlapCandidates.add(day.plus(1));
+            }
 
-                // Actual time window check
-                if (hasRegularTimeWindowOverlap(candidates, request.servingTimeWindow(), regular.getRegularDays()))
-                    throw new ServingWindowOverlapException();
-            } // Check fixed date windows as well
-            // Fixed Date Menus are allowed to overlap weekday menus, therefore, weekday menus can be ignored
-            else if (request.servingDays() instanceof FixedDateServingDays fixed) {
-                Set<LocalDate> overlapCandidates = new HashSet<>(fixed.getFixedDates());
+            // For update case: filter own menu from database results
+            List<Menu> candidates = menuRepository.findPossibleWeekdayOverlapMenus(overlapCandidates)
+                    .stream()
+                    .filter(menu -> excludedMenuId == null || !excludedMenuId.equals(menu.getId()))
+                    .toList();
 
-                for (LocalDate date : fixed.getFixedDates()) {
-                    overlapCandidates.add(date.minusDays(1));
+            // Actual time window check
+            if (hasRegularTimeWindowOverlap(candidates, request.servingTimeWindow(), regular.getRegularDays()))
+                throw new ServingWindowOverlapException();
+        } // Check fixed date windows as well
+        // Fixed Date Menus are allowed to overlap weekday menus, therefore, weekday menus can be ignored
+        else if (request.servingDays() instanceof FixedDateServingDays fixed) {
+            Set<LocalDate> overlapCandidates = new HashSet<>(fixed.getFixedDates());
 
-                    if (!request.servingTimeWindow().endTime().isAfter(request.servingTimeWindow().startTime()))
-                        overlapCandidates.add(date.plusDays(1));
-                }
+            for (LocalDate date : fixed.getFixedDates()) {
+                overlapCandidates.add(date.minusDays(1));
 
-                // For update case: filter own menu from database results
-                List<Menu> candidates = menuRepository.findPossibleFixedDateOverlapMenus(overlapCandidates)
-                        .stream()
-                        .filter(menu -> excludedMenuId == null || !excludedMenuId.equals(menu.getId()))
-                        .toList();
+                if (!request.servingTimeWindow().endTime().isAfter(request.servingTimeWindow().startTime()))
+                    overlapCandidates.add(date.plusDays(1));
+            }
 
-                if (hasFixedDateTimeWindowOverlap(candidates, request.servingTimeWindow(), fixed.getFixedDates()))
-                    throw new ServingWindowOverlapException();
-            } else
-                throw new InvalidServingDaysException();
-        }
+            // For update case: filter own menu from database results
+            List<Menu> candidates = menuRepository.findPossibleFixedDateOverlapMenus(overlapCandidates)
+                    .stream()
+                    .filter(menu -> excludedMenuId == null || !excludedMenuId.equals(menu.getId()))
+                    .toList();
+
+            if (hasFixedDateTimeWindowOverlap(candidates, request.servingTimeWindow(), fixed.getFixedDates()))
+                throw new ServingWindowOverlapException();
+        } else
+            throw new InvalidServingDaysException();
     }
 
-    /** Compares regular menus using [start, end) windows and their relative start days. */
+    // Compares regular menus using [start, end) windows and their relative start days.
     boolean hasRegularTimeWindowOverlap(List<Menu> existingMenus, ServingTimeWindow requestedWindow,
                                         Set<DayOfWeek> requestedDays) {
         long day = Duration.ofDays(1).toNanos();
@@ -145,7 +146,7 @@ public class MenuService {
         return false;
     }
 
-    /** Compares fixed-date menus using [start, end) windows on their actual dates. */
+    // Compares fixed-date menus using [start, end) windows on their actual dates.
     boolean hasFixedDateTimeWindowOverlap(List<Menu> existingMenus, ServingTimeWindow requestedWindow,
                                           Set<LocalDate> requestedDates) {
         // For each candidate menu every date of the new menu needs to be checked
