@@ -1,0 +1,19 @@
+---
+title: OrderDraft (backend · de.oth.swgigbackend.cart)
+---
+classDiagram
+  direction LR
+  class OrderDraft {
+    <<Entity>>
+    ~UUID id
+    ~UUID sessionId
+    ~long version
+    ~List~DraftItem~ items
+    #OrderDraft()
+    ~OrderDraft(UUID sessionId)
+  }
+  class DraftItem {
+    <<Entity>>
+  }
+  OrderDraft "1" *-- "0..100" DraftItem : items / draft
+  note for OrderDraft "Table order_drafts, session_id unique (one cart per dining session)<br>version: @Version, items: cascade ALL + orphanRemoval, ordered by id"

@@ -1,0 +1,21 @@
+---
+title: CartErrorHandler (backend · de.oth.swgigbackend.cart)
+---
+classDiagram
+  direction LR
+  class CartErrorHandler {
+    <<RestControllerAdvice>>
+    ~cart(ResponseStatusException error) ResponseEntity~ProblemDetail~
+    ~validation(Exception error) ResponseEntity~ProblemDetail~
+    ~conflict(Exception error) ResponseEntity~ProblemDetail~
+    -problem(HttpStatusCode status, String detail) ResponseEntity~ProblemDetail~
+  }
+  class CartController {
+    <<RestController>>
+  }
+  class ProblemDetail {
+    <<Spring>>
+  }
+  CartErrorHandler ..> CartController : assignableTypes
+  CartErrorHandler ..> ProblemDetail : creates
+  note for CartErrorHandler "cart: ResponseStatusException → its status<br>validation: invalid input → 400<br>conflict: DataIntegrity / PessimisticLocking → 409<br>All responses: Cache-Control no-store"

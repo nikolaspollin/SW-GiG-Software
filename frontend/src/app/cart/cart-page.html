@@ -1,0 +1,142 @@
+<main [attr.aria-busy]="busy()">
+  <h1 tabindex="-1" #heading>Your cart</h1>
+  <p class="muted">Choose your items and review them before ordering.</p>
+  <p role="status" aria-live="polite">{{ busy() ? 'Updating…' : message() }}</p>
+  @if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+  }
+  @if (!hasAccess()) {
+    <p>Scan the QR code at your table to open your menu and cart.</p>
+  } @else {
+    <button type="button" (click)="reload()" [disabled]="busy()">Refresh menu and cart</button>
+    @if (editor(); as edit) {
+      <app-item-editor
+        [product]="edit.product"
+        [initial]="edit.item"
+        [busy]="busy()"
+        (saved)="save($event)"
+        (cancelled)="cancelEditor()"
+      />
+    }
+    <div class="columns">
+      <section aria-labelledby="menu-title">
+        <h2 id="menu-title">Menu</h2>
+        <form class="search" (submit)="findProducts($event)">
+          <label for="product-search">Find a product</label>
+          <div>
+            <input
+              type="search"
+              id="product-search"
+              maxlength="100"
+              [value]="search()"
+              (input)="setSearch($event)"
+            />
+            <button type="submit" [disabled]="busy()">Search</button>
+          </div>
+        </form>
+        @if (products(); as page) {
+          @for (product of page.content; track product.id) {
+            <article>
+              <h3>{{ product.name }}</h3>
+              <p>{{ product.price | currency: 'EUR' }}</p>
+              @if (!product.available) {
+                <p class="muted">Sold out</p>
+              }
+              <button
+                type="button"
+                (click)="open(product, $event)"
+                [disabled]="busy() || !product.available"
+                [attr.aria-label]="'Add to cart: ' + product.name"
+              >
+                Add to cart
+              </button>
+            </article>
+          } @empty {
+            <p>No products found.</p>
+          }
+          <nav aria-label="Menu pages" class="actions">
+            <button
+              type="button"
+              (click)="findProducts(undefined, page.page - 1)"
+              [disabled]="busy() || page.page === 0"
+            >
+              Previous
+            </button>
+            <span>Page {{ page.page + 1 }}</span>
+            <button
+              type="button"
+              (click)="findProducts(undefined, page.page + 1)"
+              [disabled]="busy() || (page.page + 1) * page.size >= page.totalElements"
+            >
+              Next
+            </button>
+          </nav>
+        }
+      </section>
+      <section aria-labelledby="cart-title">
+        <h2 id="cart-title">Selected items</h2>
+        @if (cart(); as current) {
+          @for (item of current.items; track item.id) {
+            <article>
+              <h3>{{ item.quantity }} × {{ item.name }}</h3>
+              @for (extra of item.extras; track extra.extraId) {
+                <p>{{ extra.quantity }} × {{ extra.name }} per serving</p>
+              }
+              @if (item.note) {
+                <p>Note: {{ item.note }}</p>
+              }
+              @for (error of item.errors; track $index) {
+                <p class="error">{{ error }}</p>
+              }
+              <p>
+                {{
+                  item.total === null
+                    ? 'Price unavailable'
+                    : (item.total | currency: current.currency)
+                }}
+              </p>
+              <div class="actions">
+                <button
+                  type="button"
+                  (click)="edit(item, $event)"
+                  [disabled]="busy()"
+                  [attr.aria-label]="'Edit ' + item.name"
+                >
+                  Edit
+                </button>
+                <button
+                  type="button"
+                  (click)="remove(item)"
+                  [disabled]="busy()"
+                  [attr.aria-label]="'Remove ' + item.name"
+                >
+                  Remove
+                </button>
+              </div>
+            </article>
+          } @empty {
+            <p>Your cart is empty.</p>
+          }
+          <p class="total">
+            Total:
+            {{
+              current.total === null
+                ? 'Review unavailable items'
+                : (current.total | currency: current.currency)
+            }}
+          </p>
+          <p class="muted">Prices are checked again against the current menu.</p>
+          <button
+            type="button"
+            class="primary"
+            (click)="check()"
+            [disabled]="busy() || !current.canSubmit"
+          >
+            Check cart
+          </button>
+          <p class="muted">Checking your cart does not send an order.</p>
+        }
+      </section>
+    </div>
+  }
+</main>

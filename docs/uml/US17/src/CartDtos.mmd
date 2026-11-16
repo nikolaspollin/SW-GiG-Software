@@ -1,0 +1,70 @@
+---
+title: CartDtos (backend · de.oth.swgigbackend.cart)
+---
+classDiagram
+  direction TB
+  class CartDtos {
+    <<final>>
+    -CartDtos()
+  }
+  class ExtraInput["CartDtos.ExtraInput"] {
+    <<record>>
+    +UUID extraId
+    +int quantity
+  }
+  class ItemInput["CartDtos.ItemInput"] {
+    <<record>>
+    +UUID productId
+    +int quantity
+    +String note
+    +List~ExtraInput~ extras
+  }
+  class ExtraView["CartDtos.ExtraView"] {
+    <<record>>
+    +UUID extraId
+    +String name
+    +int quantity
+    +BigDecimal surcharge
+  }
+  class ItemView["CartDtos.ItemView"] {
+    <<record>>
+    +UUID id
+    +UUID productId
+    +String name
+    +int quantity
+    +String note
+    +List~ExtraView~ extras
+    +BigDecimal unitPrice
+    +BigDecimal total
+    +List~String~ errors
+  }
+  class DraftView["CartDtos.DraftView"] {
+    <<record>>
+    +UUID id
+    +List~ItemView~ items
+    +BigDecimal total
+    +String currency
+    +boolean canSubmit
+  }
+  class ProductPage["CartDtos.ProductPage"] {
+    <<record>>
+    +List~Product~ content
+    +int page
+    +int size
+    +int totalElements
+  }
+  class Product["CartCatalog.Product"] {
+    <<record>>
+  }
+  CartDtos <.. ExtraInput : nested in
+  CartDtos <.. ItemInput : nested in
+  CartDtos <.. ExtraView : nested in
+  CartDtos <.. ItemView : nested in
+  CartDtos <.. DraftView : nested in
+  CartDtos <.. ProductPage : nested in
+  ItemInput *-- "0..50" ExtraInput : extras
+  ItemView *-- "0..*" ExtraView : extras
+  DraftView *-- "0..*" ItemView : items
+  ProductPage o-- "0..*" Product : content
+  note for ItemInput "Validation: quantity 1–99, note ≤ 500 chars,<br>extras not null, ≤ 50 entries"
+  note for ExtraInput "Validation: extraId not null, quantity 1–99"

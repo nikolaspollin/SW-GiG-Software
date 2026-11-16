@@ -1,0 +1,54 @@
+main {
+  max-width: 72rem;
+  padding: 1.5rem 1rem 4rem;
+  margin: auto;
+}
+h1 {
+  margin-bottom: 0.25rem;
+}
+.columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-top: 1.5rem;
+}
+article {
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid #c2ccc4;
+  border-radius: 0.6rem;
+  background: white;
+}
+h3 {
+  margin: 0;
+}
+p {
+  overflow-wrap: anywhere;
+}
+.actions,
+.search div {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.search {
+  margin-bottom: 1rem;
+}
+.search label {
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.total {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+app-item-editor {
+  display: block;
+  margin-top: 1.5rem;
+}
+@media (max-width: 42rem) {
+  .columns {
+    grid-template-columns: 1fr;
+  }
+}

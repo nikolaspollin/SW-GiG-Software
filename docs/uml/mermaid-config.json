@@ -1,0 +1,5 @@
+{
+  "theme": "default",
+  "markdownAutoWrap": false,
+  "class": { "hideEmptyMembersBox": true }
+}

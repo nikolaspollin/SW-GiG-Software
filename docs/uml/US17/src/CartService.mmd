@@ -1,0 +1,53 @@
+---
+title: CartService (backend · de.oth.swgigbackend.cart)
+---
+classDiagram
+  direction LR
+  class CartService {
+    <<Service>>
+    -OrderDraftRepository drafts
+    -GuestSessionAccess sessions
+    -CartCatalog catalog
+    +CartService(OrderDraftRepository drafts, GuestSessionAccess sessions, CartCatalog catalog)
+    +current(String token) DraftView
+    +products(String token, String search, int page, int size) ProductPage
+    +add(String token, ItemInput input) DraftView
+    +update(String token, UUID itemId, ItemInput input) DraftView
+    +remove(String token, UUID itemId) DraftView
+    +validateForSubmission(String token) DraftView
+    +product(String token, UUID productId) Product
+    -requiredDraft(UUID sessionId) OrderDraft
+    -requiredItem(OrderDraft draft, UUID itemId) DraftItem
+    -productsById() Map~UUID, Product~
+    -validateInput(ItemInput input, Map~UUID, Product~ products) void
+    -errors(Product product, int quantity, Map~UUID, Integer~ extras) List~String~
+    -view(OrderDraft draft, Map~UUID, Product~ products) DraftView
+    -itemView(DraftItem item, Product product) ItemView
+    -money(BigDecimal value)$ BigDecimal
+    -invalid(String message)$ ResponseStatusException
+  }
+  class OrderDraftRepository {
+    <<interface>>
+  }
+  class GuestSessionAccess {
+    <<interface>>
+  }
+  class CartCatalog {
+    <<interface>>
+  }
+  class OrderDraft {
+    <<Entity>>
+  }
+  class DraftItem {
+    <<Entity>>
+  }
+  class CartDtos {
+    <<final>>
+  }
+  CartService --> "1" OrderDraftRepository : drafts
+  CartService --> "1" GuestSessionAccess : sessions
+  CartService --> "1" CartCatalog : catalog
+  CartService ..> OrderDraft : creates / modifies
+  CartService ..> DraftItem : creates / modifies
+  CartService ..> CartDtos : builds views
+  note for CartService "@Transactional — all public methods run in a transaction;<br>reads are readOnly, edits lock the session's draft"

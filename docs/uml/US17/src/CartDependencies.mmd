@@ -1,0 +1,28 @@
+---
+title: CartDependencies (backend · de.oth.swgigbackend.cart)
+---
+classDiagram
+  direction LR
+  class CartDependencies {
+    <<Configuration>>
+    ~UUID SESSION_ONE$
+    ~UUID SESSION_TWO$
+    ~UUID PASTA$
+    ~UUID WATER$
+    ~UUID CHEESE$
+    ~guestSessionAccess() GuestSessionAccess
+    ~cartCatalog() CartCatalog
+    ~demoGuestSessionAccess() GuestSessionAccess
+    ~demoCartCatalog() CartCatalog
+  }
+  class GuestSessionAccess {
+    <<interface>>
+    +requireOpenSession(String bearerToken) UUID
+  }
+  class CartCatalog {
+    <<interface>>
+    +products() List~Product~
+  }
+  CartDependencies ..> GuestSessionAccess : «Bean» creates
+  CartDependencies ..> CartCatalog : «Bean» creates
+  note for CartDependencies "Profile '!cart-demo': guestSessionAccess / cartCatalog throw 503<br>Profile 'cart-demo': demo tokens and a small sample menu"

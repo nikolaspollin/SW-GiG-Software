@@ -1,0 +1,26 @@
+---
+title: DraftItem (backend · de.oth.swgigbackend.cart)
+---
+classDiagram
+  direction LR
+  class DraftItem {
+    <<Entity>>
+    ~UUID id
+    ~OrderDraft draft
+    ~UUID productId
+    ~int quantity
+    ~String note
+    ~Map~UUID, Integer~ extras
+    #DraftItem()
+    ~DraftItem(OrderDraft draft, UUID productId)
+    ~update(ItemInput input) void
+  }
+  class OrderDraft {
+    <<Entity>>
+  }
+  class ItemInput["CartDtos.ItemInput"] {
+    <<record>>
+  }
+  OrderDraft "1" *-- "0..100" DraftItem : items / draft
+  DraftItem ..> ItemInput : update from
+  note for DraftItem "Table order_draft_items<br>extras: element collection order_draft_item_extras (extra_id → quantity)"
