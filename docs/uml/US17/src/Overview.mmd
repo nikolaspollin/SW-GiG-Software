@@ -1,0 +1,62 @@
+---
+title: US17 cart — overview of new classes
+---
+classDiagram
+  direction LR
+  namespace frontend {
+    class CartPage {
+      <<Component>>
+    }
+    class ItemEditor {
+      <<Component>>
+    }
+    class CartApi {
+      <<Service>>
+    }
+  }
+  namespace backend {
+    class CartController {
+      <<RestController>>
+    }
+    class CartErrorHandler {
+      <<RestControllerAdvice>>
+    }
+    class CartService {
+      <<Service>>
+    }
+    class CartDtos {
+      <<final>>
+    }
+    class OrderDraftRepository {
+      <<interface>>
+    }
+    class OrderDraft {
+      <<Entity>>
+    }
+    class DraftItem {
+      <<Entity>>
+    }
+    class GuestSessionAccess {
+      <<interface>>
+    }
+    class CartCatalog {
+      <<interface>>
+    }
+    class CartDependencies {
+      <<Configuration>>
+    }
+  }
+  CartPage *-- ItemEditor
+  CartPage --> CartApi
+  CartApi ..> CartController : HTTP /api/order-drafts
+  CartErrorHandler ..> CartController
+  CartController --> CartService
+  CartController ..> CartDtos
+  CartService --> OrderDraftRepository
+  CartService --> GuestSessionAccess
+  CartService --> CartCatalog
+  CartService ..> CartDtos
+  OrderDraftRepository ..> OrderDraft
+  OrderDraft "1" *-- "0..100" DraftItem
+  CartDependencies ..> GuestSessionAccess : «Bean»
+  CartDependencies ..> CartCatalog : «Bean»

@@ -1,0 +1,52 @@
+---
+title: CartPage (frontend · src/app/cart/cart-page.ts)
+---
+classDiagram
+  direction LR
+  class CartPage {
+    <<Component>>
+    -api: CartApi «readonly»
+    -route: ActivatedRoute «readonly»
+    -router: Router «readonly»
+    -destroyRef: DestroyRef «readonly»
+    -heading: Signal~ElementRef~HTMLElement~~ «readonly»
+    -token: string = ''
+    -sessionRevision: number = 0
+    -returnFocus: HTMLElement | null
+    +cart: WritableSignal~Cart | null~ «readonly»
+    +products: WritableSignal~ProductPage | null~ «readonly»
+    +busy: WritableSignal~boolean~ «readonly»
+    +error: WritableSignal~string~ «readonly»
+    +message: WritableSignal~string~ «readonly»
+    +search: WritableSignal~string~ «readonly»
+    +editor: WritableSignal~EditorState | null~ «readonly»
+    +hasAccess: WritableSignal~boolean~ «readonly»
+    +ngOnInit() void
+    -activate(fragment: string | null) void
+    +reload() Promise~void~
+    +findProducts(event?: Event, page: number = 0) Promise~void~
+    +open(product: Product, event: Event) void
+    +edit(item: CartItem, event: Event) Promise~void~
+    +cancelEditor() void
+    +save(input: ItemInput) Promise~void~
+    +remove(item: CartItem) Promise~void~
+    +check() Promise~void~
+    +setSearch(event: Event) void
+    -run~T~(request: token → Observable~T~, apply: value → void) Promise~void~
+  }
+  class EditorState["«anonymous» editor state"] {
+    +product: Product
+    +item: CartItem | null
+  }
+  class CartApi {
+    <<Service>>
+  }
+  class ItemEditor {
+    <<Component>>
+  }
+  CartPage --> "1" CartApi : api
+  CartPage *-- "0..1" ItemEditor : template (app-item-editor)
+  CartPage *-- "0..1" EditorState : editor
+  CartPage ..> Cart : shows
+  CartPage ..> ProductPage : shows
+  note for CartPage "selector: app-cart-page<br>Guest token from URL fragment #access=…, kept in sessionStorage"

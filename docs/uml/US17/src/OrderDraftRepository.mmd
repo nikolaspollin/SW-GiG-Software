@@ -1,0 +1,19 @@
+---
+title: OrderDraftRepository (backend · de.oth.swgigbackend.cart)
+---
+classDiagram
+  direction LR
+  class OrderDraftRepository {
+    <<interface>>
+    +findBySessionId(UUID sessionId) Optional~OrderDraft~
+    +lockBySessionId(UUID sessionId) Optional~OrderDraft~
+  }
+  class JpaRepository~OrderDraft, UUID~ {
+    <<interface>>
+  }
+  class OrderDraft {
+    <<Entity>>
+  }
+  JpaRepository~OrderDraft, UUID~ <|-- OrderDraftRepository
+  OrderDraftRepository ..> OrderDraft : loads / locks
+  note for OrderDraftRepository "lockBySessionId: @Lock(PESSIMISTIC_WRITE)<br>select d from OrderDraft d where d.sessionId = :sessionId"

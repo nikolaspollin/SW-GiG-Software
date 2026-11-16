@@ -1,0 +1,36 @@
+---
+title: CartController (backend · de.oth.swgigbackend.cart)
+---
+classDiagram
+  direction LR
+  class CartController {
+    <<RestController>>
+    -CartService carts
+    +CartController(CartService carts)
+    ~preventCaching(HttpServletResponse response) void
+    +current(String authorization) DraftView
+    +products(String authorization, String search, int page, int size) ProductPage
+    +add(String authorization, ItemInput input) DraftView
+    +product(String authorization, UUID productId) Product
+    +update(String authorization, UUID itemId, ItemInput input) DraftView
+    +remove(String authorization, UUID itemId) DraftView
+    +validate(String authorization) DraftView
+    -token(String authorization) String
+  }
+  class CartService {
+    <<Service>>
+  }
+  class CartErrorHandler {
+    <<RestControllerAdvice>>
+  }
+  class CartDtos {
+    <<final>>
+  }
+  class CartCatalog {
+    <<interface>>
+  }
+  CartController --> "1" CartService : carts
+  CartController ..> CartDtos : request/response records
+  CartController ..> CartCatalog : returns Product
+  CartErrorHandler ..> CartController : handles exceptions of
+  note for CartController "@RequestMapping('/api/order-drafts')<br>Every endpoint requires 'Authorization: Bearer token'"

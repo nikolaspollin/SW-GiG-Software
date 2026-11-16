@@ -1,0 +1,30 @@
+---
+title: CartCatalog (backend · de.oth.swgigbackend.cart)
+---
+classDiagram
+  direction LR
+  class CartCatalog {
+    <<interface>>
+    +products() List~Product~
+  }
+  class Product["CartCatalog.Product"] {
+    <<record>>
+    +UUID id
+    +String name
+    +BigDecimal price
+    +boolean active
+    +boolean available
+    +Map~UUID, Extra~ extras
+    +Product(UUID id, String name, BigDecimal price, boolean active, boolean available, Map~UUID, Extra~ extras)
+  }
+  class Extra["CartCatalog.Extra"] {
+    <<record>>
+    +UUID id
+    +String name
+    +BigDecimal surcharge
+    +int maximumQuantity
+  }
+  CartCatalog ..> Product : provides
+  Product *-- "0..*" Extra : extras
+  note for CartCatalog "Integration port for F06/F07 (menu data).<br>Product and Extra are nested records of CartCatalog."
+  note for Product "Compact constructor copies extras (Map.copyOf)"

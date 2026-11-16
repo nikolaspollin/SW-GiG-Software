@@ -1,0 +1,87 @@
+---
+title: CartApi and API models (frontend · src/app/cart/cart-api.ts)
+---
+classDiagram
+  direction TB
+  class CartApi {
+    <<Service>>
+    -http: HttpClient «readonly»
+    -root: string = '/api/order-drafts' «readonly»
+    +current(token: string) Observable~Cart~
+    +products(token: string, search: string, page: number) Observable~ProductPage~
+    +product(token: string, id: string) Observable~Product~
+    +save(token: string, item: ItemInput, id?: string) Observable~Cart~
+    +remove(token: string, id: string) Observable~Cart~
+    +validate(token: string) Observable~Cart~
+    -options(token: string) HttpOptions
+  }
+  class Cart {
+    <<interface>>
+    +id: string | null
+    +items: CartItem[]
+    +total: number | null
+    +currency: string
+    +canSubmit: boolean
+  }
+  class CartItem {
+    <<interface>>
+    +id: string
+    +productId: string
+    +name: string
+    +quantity: number
+    +note: string
+    +extras: CartItemExtra[]
+    +unitPrice: number | null
+    +total: number | null
+    +errors: string[]
+  }
+  class CartItemExtra["«anonymous» CartItem.extras element"] {
+    +extraId: string
+    +name: string
+    +quantity: number
+    +surcharge: number | null
+  }
+  class ItemInput {
+    <<interface>>
+    +productId: string
+    +quantity: number
+    +note: string
+    +extras: ItemInputExtra[]
+  }
+  class ItemInputExtra["«anonymous» ItemInput.extras element"] {
+    +extraId: string
+    +quantity: number
+  }
+  class ProductPage {
+    <<interface>>
+    +content: Product[]
+    +page: number
+    +size: number
+    +totalElements: number
+  }
+  class Product {
+    <<interface>>
+    +id: string
+    +name: string
+    +price: number
+    +active: boolean
+    +available: boolean
+    +extras: Record~string, Extra~
+  }
+  class Extra {
+    <<interface>>
+    +id: string
+    +name: string
+    +surcharge: number
+    +maximumQuantity: number
+  }
+  CartApi ..> Cart : returns
+  CartApi ..> ProductPage : returns
+  CartApi ..> Product : returns
+  CartApi ..> ItemInput : sends
+  Cart *-- "0..*" CartItem : items
+  CartItem *-- "0..*" CartItemExtra : extras
+  ItemInput *-- "0..*" ItemInputExtra : extras
+  ProductPage o-- "0..*" Product : content
+  Product *-- "0..*" Extra : extras
+  note for CartApi "Every request sends 'Authorization: Bearer token'"

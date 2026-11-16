@@ -1,0 +1,18 @@
+---
+title: GuestSessionAccess (backend · de.oth.swgigbackend.cart)
+---
+classDiagram
+  direction LR
+  class GuestSessionAccess {
+    <<interface>>
+    +requireOpenSession(String bearerToken) UUID
+  }
+  class CartService {
+    <<Service>>
+  }
+  class CartDependencies {
+    <<Configuration>>
+  }
+  CartService --> "1" GuestSessionAccess : sessions
+  CartDependencies ..> GuestSessionAccess : «Bean» provides
+  note for GuestSessionAccess "Integration port for F03/T01: validates the credential,<br>its table scope and the open session state"

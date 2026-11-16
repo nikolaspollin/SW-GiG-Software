@@ -1,0 +1,35 @@
+---
+title: ItemEditor (frontend · src/app/cart/item-editor.ts)
+---
+classDiagram
+  direction LR
+  class ItemEditor {
+    <<Component>>
+    +product: InputSignal~Product~ «required»
+    +initial: InputSignal~CartItem | null~
+    +busy: InputSignal~boolean~
+    +saved: OutputEmitterRef~ItemInput~
+    +cancelled: OutputEmitterRef~void~
+    -heading: Signal~ElementRef~HTMLElement~~ «readonly»
+    +values: WritableSignal~EditorValues~ «readonly»
+    +fields: FieldTree~EditorValues~ «readonly»
+    +extras: Signal~Extra[]~ «readonly»
+    +extraQuantities: WritableSignal~Record#lt;string, number#gt;~ «readonly»
+    +extrasValid: Signal~boolean~ «readonly»
+    +constructor()
+    +setExtra(id: string, event: Event) void
+    +submit(event: Event) void
+  }
+  class EditorValues["«anonymous» form values"] {
+    +quantity: number
+    +note: string
+  }
+  class CartPage {
+    <<Component>>
+  }
+  ItemEditor *-- "1" EditorValues : values
+  CartPage *-- "0..1" ItemEditor : template (app-item-editor)
+  ItemEditor ..> ItemInput : emits via saved
+  ItemEditor ..> Product : edits options of
+  ItemEditor ..> CartItem : initial values from
+  note for ItemEditor "selector: app-item-editor<br>Validation: quantity integer 1–99, note ≤ 500 chars,<br>extra quantity 0..maximumQuantity"
