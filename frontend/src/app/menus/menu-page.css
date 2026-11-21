@@ -1,0 +1,174 @@
+main {
+  max-width: 72rem;
+  margin: auto;
+  padding: 2rem 1rem 4rem;
+}
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+}
+.page-header > div:first-child {
+  flex: 1 1 28rem;
+}
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+h1 {
+  margin: 0.25rem 0 0.5rem;
+  font-size: clamp(1.8rem, 4vw, 2.3rem);
+  line-height: 1.2;
+}
+h2 {
+  font-size: 1.2rem;
+}
+h3 {
+  font-size: 1.15rem;
+  overflow-wrap: anywhere;
+}
+.eyebrow {
+  color: #53635b;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+.intro {
+  max-width: 42rem;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.status-message {
+  min-height: 1.5rem;
+  margin: 1rem 0;
+}
+.feedback {
+  margin-bottom: 1rem;
+}
+.workspace {
+  display: grid;
+  gap: 1.5rem;
+  align-items: start;
+}
+.workspace.with-editor {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+}
+.menu-list {
+  min-width: 0;
+}
+.list-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+.count {
+  padding: 0.05rem 0.55rem;
+  border-radius: 1rem;
+  background: #e1e9e2;
+  font-size: 0.9rem;
+}
+.menu-card {
+  padding: 1.25rem;
+  border: 1px solid #c2ccc4;
+  border-radius: 0.6rem;
+  background: white;
+  margin-bottom: 1rem;
+}
+.card-heading {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+.badge {
+  padding: 0.15rem 0.6rem;
+  border-radius: 1rem;
+  background: #f6edcf;
+  color: #624b10;
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.badge.active {
+  background: #e1efe5;
+  color: #1e5737;
+}
+.badge.archived {
+  background: #e9ece9;
+  color: #48544d;
+}
+dl {
+  display: grid;
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+dt {
+  color: #53635b;
+  font-size: 0.85rem;
+}
+dd {
+  margin: 0.1rem 0 0;
+  overflow-wrap: anywhere;
+}
+.next-day,
+.archived-note {
+  font-size: 0.9rem;
+}
+.menu-card.archived {
+  background: #f0f2ed;
+}
+.danger {
+  border-color: #9b2020;
+  color: #9b2020;
+}
+.empty-state {
+  padding: 2rem 1rem;
+  border: 1px dashed #9aaa9e;
+  border-radius: 0.6rem;
+  text-align: center;
+}
+.empty-state h3 {
+  margin-bottom: 0.5rem;
+}
+dialog {
+  width: min(30rem, calc(100% - 2rem));
+  max-height: calc(100dvh - 2rem);
+  overflow: auto;
+  padding: 1.5rem;
+  border: 1px solid #476357;
+  border-radius: 0.6rem;
+  color: #202e28;
+}
+dialog::backdrop {
+  background: rgb(20 35 27 / 45%);
+}
+dialog p {
+  margin: 1rem 0;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 56rem) {
+  .workspace.with-editor {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .with-editor app-menu-editor {
+    grid-row: 1;
+  }
+}
+@media (max-width: 30rem) {
+  main {
+    padding-top: 1.25rem;
+  }
+  .card-heading {
+    flex-wrap: wrap;
+  }
+  .menu-card {
+    padding: 1rem;
+  }
+}

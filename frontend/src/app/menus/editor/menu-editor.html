@@ -1,0 +1,177 @@
+<section class="editor" aria-labelledby="editor-title" [attr.aria-busy]="busy()">
+    <header>
+        <p class="eyebrow">{{ initial() ? 'Menü bearbeiten' : 'Menü anlegen' }}</p>
+        <h2 id="editor-title" tabindex="-1" #heading>
+            {{ initial() ? initial()?.name : 'Neues Menü' }}
+        </h2>
+    </header>
+
+    @if (serverError()) {
+        <p class="error feedback" role="alert">{{ serverError() }}</p>
+    }
+
+    <form (submit)="submit($event)" novalidate>
+        <fieldset [disabled]="busy()">
+            <legend>Grunddaten</legend>
+            <div class="field">
+                <label for="menu-name">Name</label>
+                <input
+                    id="menu-name"
+                    type="text"
+                    [formField]="fields.name"
+                    placeholder="z. B. Abendkarte"
+                    autocomplete="off"
+                    aria-describedby="name-error"
+                />
+                @if (fields.name().invalid() && (fields.name().touched() || attempted())) {
+                    <p class="error" id="name-error">Bitte gib einen Namen ein.</p>
+                } @else {
+                    <span id="name-error"></span>
+                }
+            </div>
+            <div class="field">
+                <label for="menu-status">Status</label>
+                <select
+                    id="menu-status"
+                    [formField]="fields.lifecycleStatus"
+                    aria-describedby="status-hint"
+                >
+                    <option value="DRAFT">Entwurf</option>
+                    <option value="ACTIVE">Aktiv</option>
+                </select>
+                <p class="muted hint" id="status-hint">
+                    Entwürfe können vorbereitet werden. Beim Aktivieren werden die Angebotszeiten
+                    auf Überschneidungen geprüft.
+                </p>
+            </div>
+        </fieldset>
+
+        <fieldset [disabled]="busy()">
+            <legend>Angebotstage</legend>
+            <div class="field">
+                <label for="schedule-type">Wiederholung</label>
+                <select id="schedule-type" [formField]="fields.scheduleType">
+                    <option value="regular">Wöchentlich</option>
+                    <option value="fixed">An bestimmten Tagen</option>
+                </select>
+            </div>
+            @if (values().scheduleType === 'regular') {
+                <fieldset class="weekdays" aria-describedby="days-hint days-error">
+                    <legend>Wochentage auswählen</legend>
+                    <div class="day-options">
+                        @for (day of weekdays; track day.value) {
+                            <label class="day-option">
+                                <input
+                                    type="checkbox"
+                                    [checked]="values().regularDays.includes(day.value)"
+                                    (change)="toggleDay(day.value, $event)"
+                                />
+                                {{ day.label }}
+                            </label>
+                        }
+                    </div>
+                </fieldset>
+                <p class="muted hint" id="days-hint">Wähle mindestens einen Wochentag.</p>
+                @if (attempted() && fields.regularDays().invalid()) {
+                    <p class="error" id="days-error">Bitte wähle mindestens einen Wochentag aus.</p>
+                } @else {
+                    <span id="days-error"></span>
+                }
+            } @else {
+                <div class="field">
+                    <label for="serving-date">Datum</label>
+                    <div class="date-entry">
+                        <input
+                            id="serving-date"
+                            type="date"
+                            [value]="dateInput()"
+                            (input)="setDate($event)"
+                            aria-describedby="dates-hint date-entry-error"
+                            [attr.aria-invalid]="!!dateError()"
+                        />
+                        <button type="button" (click)="addDate()">Datum hinzufügen</button>
+                    </div>
+                    <p class="muted hint" id="dates-hint">
+                        Füge mindestens ein Datum hinzu. Mehrere Termine sind möglich.
+                    </p>
+                    <p class="error" id="date-entry-error" aria-live="polite">{{ dateError() }}</p>
+                </div>
+                @if (values().fixedDates.length) {
+                    <ul class="dates" aria-label="Ausgewählte Termine">
+                        @for (date of values().fixedDates; track date) {
+                            <li>
+                                <time [attr.datetime]="date">{{ formatDate(date) }}</time>
+                                <button
+                                    type="button"
+                                    (click)="removeDate(date)"
+                                    [attr.aria-label]="'Datum ' + formatDate(date) + ' entfernen'"
+                                >
+                                    Entfernen
+                                </button>
+                            </li>
+                        }
+                    </ul>
+                }
+                @if (attempted() && fields.fixedDates().invalid()) {
+                    <p class="error">Bitte füge mindestens ein gültiges Datum hinzu.</p>
+                }
+            }
+        </fieldset>
+
+        <fieldset [disabled]="busy()" aria-describedby="time-hint time-error">
+            <legend>Angebotszeit</legend>
+            <div class="time-fields">
+                <div class="field">
+                    <label for="start-time">Beginn</label>
+                    <input
+                        id="start-time"
+                        type="time"
+                        step="any"
+                        [formField]="fields.startTime"
+                        [attr.aria-invalid]="attempted() && fields.startTime().invalid()"
+                    />
+                </div>
+                <div class="field">
+                    <label for="end-time">Ende</label>
+                    <input
+                        id="end-time"
+                        type="time"
+                        step="any"
+                        [formField]="fields.endTime"
+                        [attr.aria-invalid]="attempted() && fields.endTime().invalid()"
+                    />
+                </div>
+            </div>
+            <p class="muted hint" id="time-hint">
+                @if (overnight()) {
+                    Das Zeitfenster endet am Folgetag. Gleiche Uhrzeiten bedeuten 24 Stunden.
+                } @else {
+                    Liegt das Ende vor oder auf dem Beginn, endet das Zeitfenster am Folgetag.
+                }
+                Die ausgewählten Angebotstage sind jeweils die Starttage.
+            </p>
+            @if (attempted() && (fields.startTime().invalid() || fields.endTime().invalid())) {
+                <p class="error" id="time-error">
+                    Bitte gib gültige Uhrzeiten für Beginn und Ende ein.
+                </p>
+            } @else {
+                <span id="time-error"></span>
+            }
+        </fieldset>
+
+        <section class="menu-structure" aria-labelledby="structure-title">
+            <h3 id="structure-title">Kategorien</h3>
+            <p class="muted hint">Die Zuordnung von Kategorien wird später ergänzt.</p>
+        </section>
+
+        @if (attempted() && fields().invalid()) {
+            <p class="error" role="alert">Bitte vervollständige die markierten Angaben.</p>
+        }
+        <div class="form-actions">
+            <button class="primary" type="submit" [disabled]="busy()">
+                {{ busy() ? 'Bitte warten …' : 'Menü speichern' }}
+            </button>
+            <button type="button" (click)="cancelled.emit()" [disabled]="busy()">Abbrechen</button>
+        </div>
+    </form>
+</section>
