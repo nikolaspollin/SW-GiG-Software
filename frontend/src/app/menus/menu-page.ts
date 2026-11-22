@@ -70,6 +70,7 @@ export class MenuPage {
             (menus) => this.menus.set(menus),
             'Die Menüs konnten nicht geladen werden. Bitte versuche es erneut.',
         );
+
         if (!this.destroyRef.destroyed) this.loading.set(false);
     }
 
@@ -94,12 +95,14 @@ export class MenuPage {
             this.api.get(menu.id),
             (current) => {
                 this.replace(current);
+
                 if (current.lifecycleStatus === 'ARCHIVED') {
                     this.error.set(
                         'Dieses Menü wurde inzwischen archiviert und kann nicht mehr bearbeitet werden.',
                     );
                     return;
                 }
+
                 this.editorTrigger = trigger;
                 this.editor.set({ menu: current });
             },
@@ -180,6 +183,7 @@ export class MenuPage {
                 this.replace({ ...menu, lifecycleStatus: 'ARCHIVED' });
 
                 if (this.editor()?.menu?.id === menu.id) this.editor.set(null);
+
                 this.deleteDialog().nativeElement.close();
                 this.pendingDelete.set(null);
                 this.message.set(

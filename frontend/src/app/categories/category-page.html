@@ -1,0 +1,145 @@
+<main>
+    <header class="page-header">
+        <div>
+            <p class="eyebrow">Verwaltung / Speisekarten</p>
+            <h1 tabindex="-1" #heading>Kategorien verwalten</h1>
+            <p class="muted intro">
+                Erstelle und pflege deine Kategorien unabhängig von den Menüs.
+            </p>
+        </div>
+        <div class="actions">
+            <button type="button" (click)="reload()" [disabled]="busy()">Aktualisieren</button>
+            <button
+                type="button"
+                class="primary"
+                (click)="create($event)"
+                [disabled]="busy() || categories() === null || editor()?.category === null"
+            >
+                Neue Kategorie
+            </button>
+        </div>
+    </header>
+
+    <p class="status-message" role="status" aria-live="polite">
+        {{ busy() ? (loading() ? 'Kategorien werden geladen …' : 'Bitte warten …') : message() }}
+    </p>
+    @if (error() && !editor()) {
+        <p class="error feedback" role="alert">{{ error() }}</p>
+    }
+
+    <div class="workspace" [class.with-editor]="!!editor()">
+        <section
+            class="category-list"
+            aria-labelledby="category-list-title"
+            [attr.aria-busy]="busy()"
+        >
+            <div class="list-heading">
+                <h2 id="category-list-title">Bestehende Kategorien</h2>
+                @if (categories(); as current) {
+                    <span
+                        class="count"
+                        [attr.aria-label]="current.length + ' Kategorien insgesamt'"
+                        >{{ current.length }}</span
+                    >
+                }
+            </div>
+            @if (categories() !== null) {
+                @for (category of categoryList(); track category.id) {
+                    <article
+                        class="category-card"
+                        [class.archived]="category.lifecycleStatus === 'ARCHIVED'"
+                    >
+                        <div class="card-heading">
+                            <h3>{{ category.displayName }}</h3>
+                            <span
+                                class="badge"
+                                [class.active]="category.lifecycleStatus === 'ACTIVE'"
+                                [class.archived]="category.lifecycleStatus === 'ARCHIVED'"
+                                >{{ statusLabels[category.lifecycleStatus] }}</span
+                            >
+                        </div>
+                        <dl>
+                            <dt>Interner Name</dt>
+                            <dd>{{ category.internalName }}</dd>
+                        </dl>
+                        @if (category.lifecycleStatus === 'ARCHIVED') {
+                            <p class="muted archived-note">
+                                Archivierte Kategorien können nicht mehr bearbeitet werden.
+                            </p>
+                        } @else {
+                            <div class="actions">
+                                <button
+                                    type="button"
+                                    (click)="edit(category, $event)"
+                                    [disabled]="busy()"
+                                    [attr.aria-label]="
+                                        'Kategorie ' + category.displayName + ' bearbeiten'
+                                    "
+                                >
+                                    Bearbeiten
+                                </button>
+                                <button
+                                    type="button"
+                                    class="danger"
+                                    (click)="requestDelete(category)"
+                                    [disabled]="busy()"
+                                    [attr.aria-label]="
+                                        'Kategorie ' + category.displayName + ' löschen'
+                                    "
+                                >
+                                    Löschen
+                                </button>
+                            </div>
+                        }
+                    </article>
+                } @empty {
+                    <div class="empty-state">
+                        <h3>Noch keine Kategorien vorhanden</h3>
+                        <p class="muted">Lege deine erste Kategorie über „Neue Kategorie“ an.</p>
+                    </div>
+                }
+            } @else if (!loading()) {
+                <p class="muted">
+                    Die Übersicht konnte nicht geladen werden. Versuche es mit „Aktualisieren“
+                    erneut.
+                </p>
+            }
+        </section>
+
+        @if (editor(); as current) {
+            <app-category-editor
+                [initial]="current.category"
+                [busy]="busy()"
+                [serverError]="error()"
+                (saved)="save($event)"
+                (cancelled)="cancelEditor()"
+            />
+        }
+    </div>
+</main>
+
+<dialog
+    #deleteDialog
+    aria-labelledby="category-delete-title"
+    aria-describedby="category-delete-description"
+    (cancel)="cancelDelete($event)"
+>
+    <h2 id="category-delete-title">Kategorie löschen?</h2>
+    <p id="category-delete-description">
+        Die Kategorie „{{ pendingDelete()?.displayName }}“ wird archiviert. Sie bleibt in der
+        Übersicht sichtbar und kann anschließend nicht mehr bearbeitet oder aktiviert werden. Ihr
+        interner Name bleibt vergeben.
+    </p>
+    @if (deleteError()) {
+        <p class="error" role="alert">{{ deleteError() }}</p>
+    }
+    <p role="status">{{ busy() ? 'Kategorie wird gelöscht …' : '' }}</p>
+    <div class="actions">
+        <button type="button" autofocus (click)="cancelDelete()" [disabled]="busy()">
+            Abbrechen
+        </button>
+        <button type="button" class="danger" (click)="confirmDelete()" [disabled]="busy()">
+            Kategorie löschen
+        </button>
+    </div>
+</dialog>
