@@ -12,6 +12,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { firstValueFrom, Observable } from 'rxjs';
+import { STATUS_LABELS } from '../shared/lifecycle-status';
 import { MenuApi, menuErrorMessage } from './api/menu-api';
 import { MenuEditor } from './editor/menu-editor';
 import {
@@ -20,7 +21,6 @@ import {
     formatTime,
     MenuRequest,
     MenuResponse,
-    STATUS_LABELS,
 } from './api/menu-models';
 
 /** Coordinates management actions; the editor owns only form state. */

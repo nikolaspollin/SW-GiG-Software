@@ -1,4 +1,8 @@
 <header class="site-header">
-  <a routerLink="/" aria-label="GIG Startseite">GIG</a><span>Verwaltung</span>
+    <a class="brand" routerLink="/" aria-label="GIG Startseite">GIG</a><span>Verwaltung</span>
+    <nav aria-label="Verwaltung">
+        <a routerLink="/admin/menus" routerLinkActive="active" ariaCurrentWhenActive="page">Menüs</a>
+        <a routerLink="/admin/categories" routerLinkActive="active" ariaCurrentWhenActive="page">Kategorien</a>
+    </nav>
 </header>
 <router-outlet />

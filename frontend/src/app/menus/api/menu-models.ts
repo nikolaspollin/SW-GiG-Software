@@ -1,4 +1,5 @@
-export type LifecycleStatus = 'DRAFT' | 'ACTIVE' | 'ARCHIVED';
+import type { LifecycleStatus } from '../../shared/lifecycle-status';
+
 export type EditableMenuStatus = Exclude<LifecycleStatus, 'ARCHIVED'>;
 
 export const WEEKDAYS = [
@@ -36,12 +37,6 @@ export interface MenuResponse {
     servingDays: ServingDays;
     servingTimeWindow: ServingTimeWindow;
 }
-
-export const STATUS_LABELS: Record<LifecycleStatus, string> = {
-    DRAFT: 'Entwurf',
-    ACTIVE: 'Aktiv',
-    ARCHIVED: 'Archiviert',
-};
 
 export function formatDate(date: string): string {
     return date.split('-').reverse().join('.');
