@@ -1,139 +1,68 @@
-:host {
-  display: block;
-  min-width: 0;
-}
-.editor {
-  padding: 1.5rem;
-  border: 2px solid #476357;
-  border-radius: 0.6rem;
-  background: white;
-}
-header {
-  margin-bottom: 1.5rem;
-}
-h2,
-h3,
-p {
-  margin: 0;
-}
-h2 {
-  overflow-wrap: anywhere;
-}
-h3 {
-  font-size: 1rem;
-  margin-bottom: 0.5rem;
-}
-.eyebrow {
-  color: #53635b;
-  font-size: 0.85rem;
-  font-weight: 700;
-  margin-bottom: 0.25rem;
-}
-fieldset {
-  min-width: 0;
-  border: 0;
-  padding: 0;
-  margin: 0 0 1.5rem;
-}
-legend {
-  font-weight: 700;
-  font-size: 1.05rem;
-  padding: 0;
-  margin-bottom: 0.75rem;
-}
-.field {
-  display: grid;
-  gap: 0.4rem;
-  margin-bottom: 0.75rem;
-}
-label {
-  font-weight: 600;
-}
-input:not([type='checkbox']),
-select {
-  width: 100%;
-  min-width: 0;
-}
-.hint {
-  font-size: 0.9rem;
-}
 .weekdays {
-  margin: 0.75rem 0 0.5rem;
+    margin: 0.75rem 0 0.5rem;
 }
 .weekdays legend {
-  font-size: 0.9rem;
-  font-weight: 600;
+    font-size: 0.9rem;
+    font-weight: 600;
 }
 .day-options {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
 }
 .day-option {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.65rem;
-  min-height: 44px;
-  border: 1px solid #c2ccc4;
-  border-radius: 0.4rem;
-  font-weight: 400;
-  cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.65rem;
+    min-height: 44px;
+    border: 1px solid #c2ccc4;
+    border-radius: 0.4rem;
+    font-weight: 400;
+    cursor: pointer;
 }
 .day-option:has(input:checked) {
-  background: #edf3ee;
-  border-color: #476357;
+    background: #edf3ee;
+    border-color: #476357;
 }
 input[type='checkbox'] {
-  min-height: 0;
-  padding: 0;
-  width: 1.1rem;
-  height: 1.1rem;
-  accent-color: #173b31;
+    min-height: 0;
+    padding: 0;
+    width: 1.1rem;
+    height: 1.1rem;
+    accent-color: #173b31;
 }
-.date-entry,
-.form-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+.date-entry {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
 }
 .date-entry input {
-  flex: 1 1 10rem;
+    flex: 1 1 10rem;
 }
 .dates {
-  list-style: none;
-  padding: 0;
-  display: grid;
-  gap: 0.4rem;
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 0.4rem;
 }
 .dates li {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.25rem 0.5rem;
-  background: #f5f5f0;
-  border-radius: 0.4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    background: #f5f5f0;
+    border-radius: 0.4rem;
 }
 .time-fields {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-}
-.menu-structure {
-  border-top: 1px solid #dce2dd;
-  padding-top: 1rem;
-  margin-bottom: 1.5rem;
-}
-.feedback {
-  margin-bottom: 1rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
 }
 @media (max-width: 30rem) {
-  .editor {
-    padding: 1rem;
-  }
-  .time-fields {
-    grid-template-columns: 1fr;
-    gap: 0;
-  }
+    .time-fields {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
 }

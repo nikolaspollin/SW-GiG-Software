@@ -28,7 +28,7 @@ import {
     selector: 'app-menu-page',
     imports: [MenuEditor],
     templateUrl: './menu-page.html',
-    styleUrl: './menu-page.css',
+    styleUrls: ['../shared/styles/management-page.css', './menu-page.css'],
 })
 export class MenuPage {
     private readonly api = inject(MenuApi);

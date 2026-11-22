@@ -36,7 +36,7 @@ interface MenuFormValues {
     selector: 'app-menu-editor',
     imports: [FormField],
     templateUrl: './menu-editor.html',
-    styleUrl: './menu-editor.css',
+    styleUrls: ['../../shared/styles/management-editor.css', './menu-editor.css'],
 })
 export class MenuEditor {
     readonly initial = input<MenuResponse | null>(null);

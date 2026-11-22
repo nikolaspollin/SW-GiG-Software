@@ -1,0 +1,78 @@
+:host {
+    display: block;
+    min-width: 0;
+}
+.editor {
+    padding: 1.5rem;
+    border: 2px solid #476357;
+    border-radius: 0.6rem;
+    background: white;
+}
+header {
+    margin-bottom: 1.5rem;
+}
+h2,
+h3,
+p {
+    margin: 0;
+}
+h2 {
+    overflow-wrap: anywhere;
+}
+h3 {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+.eyebrow {
+    color: #53635b;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+fieldset {
+    min-width: 0;
+    border: 0;
+    padding: 0;
+    margin: 0 0 1.5rem;
+}
+legend {
+    font-weight: 700;
+    font-size: 1.05rem;
+    padding: 0;
+    margin-bottom: 0.75rem;
+}
+.field {
+    display: grid;
+    gap: 0.4rem;
+    margin-bottom: 0.75rem;
+}
+label {
+    font-weight: 600;
+}
+input:not([type='checkbox']),
+select {
+    width: 100%;
+    min-width: 0;
+}
+.hint {
+    font-size: 0.9rem;
+}
+.form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+.menu-structure,
+.category-structure {
+    border-top: 1px solid #dce2dd;
+    padding-top: 1rem;
+    margin-bottom: 1.5rem;
+}
+.feedback {
+    margin-bottom: 1rem;
+}
+@media (max-width: 30rem) {
+    .editor {
+        padding: 1rem;
+    }
+}
