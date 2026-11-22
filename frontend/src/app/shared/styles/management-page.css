@@ -1,3 +1,5 @@
+@import './management-actions.css';
+
 main {
     max-width: 72rem;
     margin: auto;
@@ -38,11 +40,6 @@ h3 {
 }
 .intro {
     max-width: 42rem;
-}
-.actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
 }
 .status-message {
     min-height: 1.5rem;
@@ -124,10 +121,6 @@ dd {
 .category-card.archived {
     background: #f0f2ed;
 }
-.danger {
-    border-color: #9b2020;
-    color: #9b2020;
-}
 .empty-state {
     padding: 2rem 1rem;
     border: 1px dashed #9aaa9e;
@@ -136,22 +129,6 @@ dd {
 }
 .empty-state h3 {
     margin-bottom: 0.5rem;
-}
-dialog {
-    width: min(30rem, calc(100% - 2rem));
-    max-height: calc(100dvh - 2rem);
-    overflow: auto;
-    padding: 1.5rem;
-    border: 1px solid #476357;
-    border-radius: 0.6rem;
-    color: #202e28;
-}
-dialog::backdrop {
-    background: rgb(20 35 27 / 45%);
-}
-dialog p {
-    margin: 1rem 0;
-    overflow-wrap: anywhere;
 }
 @media (max-width: 56rem) {
     .workspace.with-editor {

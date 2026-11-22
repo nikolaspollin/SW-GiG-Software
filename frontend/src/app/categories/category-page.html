@@ -13,7 +13,7 @@
                 type="button"
                 class="primary"
                 (click)="create($event)"
-                [disabled]="busy() || categories() === null || editor()?.category === null"
+                [disabled]="busy() || items() === null || editor()?.entity === null"
             >
                 Neue Kategorie
             </button>
@@ -35,7 +35,7 @@
         >
             <div class="list-heading">
                 <h2 id="category-list-title">Bestehende Kategorien</h2>
-                @if (categories(); as current) {
+                @if (items(); as current) {
                     <span
                         class="count"
                         [attr.aria-label]="current.length + ' Kategorien insgesamt'"
@@ -43,7 +43,7 @@
                     >
                 }
             </div>
-            @if (categories() !== null) {
+            @if (items() !== null) {
                 @for (category of categoryList(); track category.id) {
                     <article
                         class="category-card"
@@ -108,7 +108,7 @@
 
         @if (editor(); as current) {
             <app-category-editor
-                [initial]="current.category"
+                [initial]="current.entity"
                 [busy]="busy()"
                 [serverError]="error()"
                 (saved)="save($event)"
@@ -118,28 +118,20 @@
     </div>
 </main>
 
-<dialog
-    #deleteDialog
-    aria-labelledby="category-delete-title"
-    aria-describedby="category-delete-description"
-    (cancel)="cancelDelete($event)"
->
-    <h2 id="category-delete-title">Kategorie löschen?</h2>
-    <p id="category-delete-description">
-        Die Kategorie „{{ pendingDelete()?.displayName }}“ wird archiviert. Sie bleibt in der
-        Übersicht sichtbar und kann anschließend nicht mehr bearbeitet oder aktiviert werden. Ihr
-        interner Name bleibt vergeben.
-    </p>
-    @if (deleteError()) {
-        <p class="error" role="alert">{{ deleteError() }}</p>
-    }
-    <p role="status">{{ busy() ? 'Kategorie wird gelöscht …' : '' }}</p>
-    <div class="actions">
-        <button type="button" autofocus (click)="cancelDelete()" [disabled]="busy()">
-            Abbrechen
-        </button>
-        <button type="button" class="danger" (click)="confirmDelete()" [disabled]="busy()">
-            Kategorie löschen
-        </button>
-    </div>
-</dialog>
+<app-delete-dialog
+    [open]="pendingDelete() !== null"
+    title="Kategorie löschen?"
+    [description]="
+        'Die Kategorie „' +
+        pendingDelete()?.displayName +
+        '“ wird archiviert. ' +
+        'Sie bleibt in der Übersicht sichtbar und kann anschließend nicht mehr bearbeitet oder aktiviert werden. ' +
+        'Ihr interner Name bleibt vergeben.'
+    "
+    confirmLabel="Kategorie löschen"
+    busyLabel="Kategorie wird gelöscht …"
+    [busy]="busy()"
+    [error]="deleteError()"
+    (confirmed)="confirmDelete()"
+    (cancelled)="cancelDelete()"
+/>

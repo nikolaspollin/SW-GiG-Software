@@ -1,0 +1,19 @@
+<dialog
+    #dialog
+    [attr.aria-labelledby]="titleId"
+    [attr.aria-describedby]="descriptionId"
+    (cancel)="cancel($event)"
+>
+    <h2 [id]="titleId">{{ title() }}</h2>
+    <p [id]="descriptionId">{{ description() }}</p>
+    @if (error()) {
+        <p class="error" role="alert">{{ error() }}</p>
+    }
+    <p role="status">{{ busy() ? busyLabel() : '' }}</p>
+    <div class="actions">
+        <button type="button" autofocus (click)="cancel()" [disabled]="busy()">Abbrechen</button>
+        <button type="button" class="danger" (click)="confirm()" [disabled]="busy()">
+            {{ confirmLabel() }}
+        </button>
+    </div>
+</dialog>

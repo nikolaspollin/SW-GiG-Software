@@ -1,9 +1,10 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { inject, Service } from '@angular/core';
+import type { CrudApi } from '../../shared/management/crud-api';
 import { CategoryRequest, CategoryResponse } from './category-models';
 
 @Service()
-export class CategoryApi {
+export class CategoryApi implements CrudApi<CategoryResponse, CategoryRequest> {
     private readonly http = inject(HttpClient);
     private readonly root = '/api/categories';
 

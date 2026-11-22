@@ -1,9 +1,10 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { inject, Service } from '@angular/core';
+import type { CrudApi } from '../../shared/management/crud-api';
 import { MenuRequest, MenuResponse } from './menu-models';
 
 @Service()
-export class MenuApi {
+export class MenuApi implements CrudApi<MenuResponse, MenuRequest> {
     private readonly http = inject(HttpClient);
     private readonly root = '/api/menus';
 

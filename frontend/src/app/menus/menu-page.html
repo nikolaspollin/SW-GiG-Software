@@ -4,8 +4,8 @@
             <p class="eyebrow">Verwaltung / Speisekarten</p>
             <h1 tabindex="-1" #heading>Menüs verwalten</h1>
             <p class="muted intro">
-                Organisiere deine Menüs und lege fest, an welchen Tagen und zu welchen Zeiten sie angeboten
-                werden.
+                Organisiere deine Menüs und lege fest, an welchen Tagen und zu welchen Zeiten sie
+                angeboten werden.
             </p>
         </div>
         <div class="actions">
@@ -14,7 +14,7 @@
                 type="button"
                 class="primary"
                 (click)="create($event)"
-                [disabled]="busy() || menus() === null || editor()?.menu === null"
+                [disabled]="busy() || items() === null || editor()?.entity === null"
             >
                 Neues Menü
             </button>
@@ -32,27 +32,36 @@
         <section class="menu-list" aria-labelledby="list-title" [attr.aria-busy]="busy()">
             <div class="list-heading">
                 <h2 id="list-title">Bestehende Menüs</h2>
-                @if (menus(); as current) {
+                @if (items(); as current) {
                     <span class="count" [attr.aria-label]="current.length + ' Menüs insgesamt'">{{
-                            current.length
-                        }}</span>
+                        current.length
+                    }}</span>
                 }
             </div>
-            @if (menus() !== null) {
+            @if (items() !== null) {
                 @for (menu of menuList(); track menu.id) {
-                    <article class="menu-card" [class.archived]="menu.lifecycleStatus === 'ARCHIVED'">
+                    <article
+                        class="menu-card"
+                        [class.archived]="menu.lifecycleStatus === 'ARCHIVED'"
+                    >
                         <div class="card-heading">
                             <h3>{{ menu.name }}</h3>
                             <span
                                 class="badge"
                                 [class.active]="menu.lifecycleStatus === 'ACTIVE'"
                                 [class.archived]="menu.lifecycleStatus === 'ARCHIVED'"
-                            >{{ statusLabels[menu.lifecycleStatus] }}</span
+                                >{{ statusLabels[menu.lifecycleStatus] }}</span
                             >
                         </div>
                         <dl>
                             <div>
-                                <dt>{{ menu.servingDays.regularDays ? 'Wöchentlich' : 'An bestimmten Tagen' }}</dt>
+                                <dt>
+                                    {{
+                                        menu.servingDays.regularDays
+                                            ? 'Wöchentlich'
+                                            : 'An bestimmten Tagen'
+                                    }}
+                                </dt>
                                 <dd>{{ formatServingDays(menu.servingDays) }}</dd>
                             </div>
                             <div>
@@ -100,14 +109,15 @@
                 }
             } @else if (!loading()) {
                 <p class="muted">
-                    Die Übersicht konnte nicht geladen werden. Versuche es mit „Aktualisieren“ erneut.
+                    Die Übersicht konnte nicht geladen werden. Versuche es mit „Aktualisieren“
+                    erneut.
                 </p>
             }
         </section>
 
         @if (editor(); as current) {
             <app-menu-editor
-                [initial]="current.menu"
+                [initial]="current.entity"
                 [busy]="busy()"
                 [serverError]="error()"
                 (saved)="save($event)"
@@ -117,25 +127,19 @@
     </div>
 </main>
 
-<dialog
-    #deleteDialog
-    aria-labelledby="delete-title"
-    aria-describedby="delete-description"
-    (cancel)="cancelDelete($event)"
->
-    <h2 id="delete-title">Menü löschen?</h2>
-    <p id="delete-description">
-        Das Menü „{{ pendingDelete()?.name }}“ wird archiviert. Es bleibt in der Übersicht sichtbar und
-        kann anschließend nicht mehr bearbeitet oder aktiviert werden.
-    </p>
-    @if (deleteError()) {
-        <p class="error" role="alert">{{ deleteError() }}</p>
-    }
-    <p role="status">{{ busy() ? 'Menü wird gelöscht …' : '' }}</p>
-    <div class="actions">
-        <button type="button" autofocus (click)="cancelDelete()" [disabled]="busy()">Abbrechen</button>
-        <button type="button" class="danger" (click)="confirmDelete()" [disabled]="busy()">
-            Menü löschen
-        </button>
-    </div>
-</dialog>
+<app-delete-dialog
+    [open]="pendingDelete() !== null"
+    title="Menü löschen?"
+    [description]="
+        'Das Menü „' +
+        pendingDelete()?.name +
+        '“ wird archiviert. ' +
+        'Es bleibt in der Übersicht sichtbar und kann anschließend nicht mehr bearbeitet oder aktiviert werden.'
+    "
+    confirmLabel="Menü löschen"
+    busyLabel="Menü wird gelöscht …"
+    [busy]="busy()"
+    [error]="deleteError()"
+    (confirmed)="confirmDelete()"
+    (cancelled)="cancelDelete()"
+/>

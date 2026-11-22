@@ -1,0 +1,22 @@
+@import '../../styles/management-actions.css';
+
+dialog {
+    width: min(30rem, calc(100% - 2rem));
+    max-height: calc(100dvh - 2rem);
+    overflow: auto;
+    padding: 1.5rem;
+    border: 1px solid #476357;
+    border-radius: 0.6rem;
+    color: #202e28;
+}
+dialog::backdrop {
+    background: rgb(20 35 27 / 45%);
+}
+h2 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+p {
+    margin: 1rem 0;
+    overflow-wrap: anywhere;
+}
